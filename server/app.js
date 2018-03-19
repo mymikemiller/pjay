@@ -97,7 +97,7 @@ app.get("/funnels/:name", function(req, res) {
     var name = req.params.name
     console.log("at get('/funnels') for funnel named", name);
 
-    firebase.getFeedURLs("gamegrumps").then(feedURLs => {
+    firebase.getFeedURLs(name).then(feedURLs => {
         return requestPodcastDatas(gameGrumpsFeed)
     }).then(podcastDatas => {
         console.log("got", podcastDatas.length, "podcastDatas")
@@ -107,8 +107,6 @@ app.get("/funnels/:name", function(req, res) {
         res.send(xml(myFunnel, { declaration: true }));
     }).catch(err => {
         console.error(err)
-        res.send(err)
+        res.status(500).send(err)
     });
-
-
 })
