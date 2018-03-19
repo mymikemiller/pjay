@@ -9,6 +9,8 @@ module.exports = {
             let podcastData = podcastDatas[i];
             for(var j = 0; j < podcastData.episodes.length; j++) {
                 var episode = podcastData.episodes[j];
+
+                console.log(episode)
                 
                 var item = 
                     { item: [
@@ -22,9 +24,9 @@ module.exports = {
                             { _attr: { length: episode.enclosure.length } },
                             { _attr: { type: episode.enclosure.type } } 
                         ] },
-                        { "itunes:subtitle": episode["itunes:subtitle"] },
+                        { "itunes:subtitle": podcastData.title }, 
                         { "itunes:image": [
-                            { _attr: { href: episode["itunes:image"] } }
+                            { _attr: { href: episode.image} }
                         ]},
                         { "itunes:duration": episode.duration },
                         { "itunes:order": 0}

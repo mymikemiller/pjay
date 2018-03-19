@@ -70,7 +70,7 @@ function generateChannelObj(podcastDatas) {
     return channelObj
 }
 
-function generateFeed(podcastDatas) {
+function generateFunnel(podcastDatas) {
     var feed = [ { rss: [ { _attr: { version: '2.0', "xmlns:itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd", 
     "xmlns:media": "http://search.yahoo.com/mrss/"} }, 
         generateChannelObj(podcastDatas)
@@ -91,7 +91,7 @@ function requestFeed(feedURLs) {
             ).then(podcastDatas => {
 
             console.log("got podcastData");
-            var feed = generateFeed(podcastDatas)
+            var feed = generateFunnel(podcastDatas)
             resolve(feed)
         });
     })
