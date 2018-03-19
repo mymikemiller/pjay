@@ -1,18 +1,21 @@
 {
   "dependencies": {
     "express": "^4.16.2",
+    "firebase-admin": "^5.11.0",
+    "fs": "0.0.1-security",
+    "minimist": "^1.2.0",
     "mongoose": "^5.0.9",
     "node-podcast-parser": "^2.1.0",
     "request": "^2.83.0",
     "xml": "^1.0.1"
   },
-  "name": "tribute",
+  "name": "pjay",
   "version": "1.0.0",
   "main": "app.js",
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --trace-warnings app"
+    "start": "nodemon app.js --trace-warnings --firebase-adminsdk-path pjay-x-firebase-adminsdk.json"
   },
   "author": "",
   "license": "ISC",

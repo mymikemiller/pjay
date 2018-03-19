@@ -6,6 +6,11 @@
 //
 // xml feed can now be accessed at https://pjay.localtunnel.me
 //
+'use strict';
+var argv = require('minimist')(process.argv.slice(2));
+
+const SERVICE_ACCOUNT_FILE_PATH = argv["firebase-adminsdk-path"] || "";
+
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path")
@@ -13,6 +18,7 @@ var xml = require("xml")
 var request = require("request");
 var parsePodcast = require("node-podcast-parser");
 var funnel = require("./support/funnel");
+var firebase = require("./support/firebase")(SERVICE_ACCOUNT_FILE_PATH)
 
 var app = express()
 app.use(bodyParser.json())
@@ -75,14 +81,34 @@ app.listen(port, function() {
     console.log("Server is running on port " + port);
 })
 
-app.get("/", function(req, res) {
-    console.log("at get('/')");
+// app.get("/", function(req, res) {
+//     console.log("at get('/')");
 
-    requestPodcastDatas(gameGrumpsFeed).then(podcastDatas => {
+//     requestPodcastDatas(gameGrumpsFeed).then(podcastDatas => {
+//         console.log("got", podcastDatas.length, "podcastDatas")
+//         var myFunnel = funnel.generate(podcastDatas)
+
+//         res.set('Content-Type', 'text/xml');
+//         res.send(xml(myFunnel, { declaration: true }));
+//     });
+// })
+
+app.get("/funnels/:name", function(req, res) {
+    var name = req.params.name
+    console.log("at get('/funnels') for funnel named", name);
+
+    firebase.getFeedURLs("gamegrumps").then(feedURLs => {
+        return requestPodcastDatas(gameGrumpsFeed)
+    }).then(podcastDatas => {
         console.log("got", podcastDatas.length, "podcastDatas")
         var myFunnel = funnel.generate(podcastDatas)
 
         res.set('Content-Type', 'text/xml');
         res.send(xml(myFunnel, { declaration: true }));
+    }).catch(err => {
+        console.error(err)
+        res.send(err)
     });
+
+
 })

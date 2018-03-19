@@ -11,8 +11,7 @@ module.exports = {
         ] } ];
     
         return funnel
-    },
-    hi: "hello"
+    }
 };
 
 function generateChannelObj(podcastDatas) {
