@@ -1,9 +1,10 @@
-// A podcast feed that uses the data from the tribute database on mLab: https://mlab.com/databases/tribute
+// Curate shared podcast feeds
+// 
 // Run the following in separate terminals to start the server, accessible over the internet
 // npm start
-// lt --port 7000 --subdomain tribute
+// lt --port 7000 --subdomain pjay
 //
-// xml feed can now be accessed at https://tribute.localtunnel.me
+// xml feed can now be accessed at https://pjay.localtunnel.me
 //
 var express = require("express");
 var bodyParser = require("body-parser");
@@ -18,36 +19,25 @@ app.use(express.static(path.join(__dirname, "public")));
 
 var port = process.env.port || 7000
 
+var titleImage = "https://reallifeglobal.com/wp-content/uploads/2016/04/podcast-300x300.png"
+
+// Just Game Grumps audio
 var gameGrumpsFeed = [
-    "https://podsync.net/9jo89Nu3f", // Game Grumps
-    "https://podsync.net/0SFebNu3h", // Carlsagan42
-    "https://podsync.net/ioVZ9Nudf" // Game Theory
+    "https://podsync.net/qyJ88uh3h" // Game Grumps
 ];
-var scienceFeed = [
-    "https://podsync.net/dKTg_2g3f", // asapSCIENCE
-    "https://podsync.net/02xdm2u3f", // Veritasium
-    "https://podsync.net/F9QsmNgdf", // Minutephysics
-    "https://podsync.net/MOtV_2gdh", // Vihart
-    "https://podsync.net/76SpmNg3f" // CGP Gray
-];
-
-var audioFeed = [
-    "http://atp.fm/episodes?format=rss", // ATP
-    "https://www.npr.org/rss/podcast.php?id=510299", // Ask me another
-    "", //
-    "", //
-    "", //
-    "", //
-]
-
-var techFeed =[
-    "http://feeds.feedburner.com/DailyTechHeadlines"
-]
 
 // Return a single channel object with all the episodes from the specified podcastDatas
 function aggregateChannels(podcastDatas) {
 
-    var channelObj = { channel: [] }
+    var channelObj = { channel: [
+        {"media:thumbnail": { _attr: { "url": titleImage } } },
+        {"itunes:image": { _attr: { "href": titleImage } } },
+        {"title": "PJAY"},
+        {"description": "Some awesome podcasts!"},
+        {"generator": "PJAY"}
+    ] }
+
+    var items = []
 
     for (var i=0; i<podcastDatas.length; i++) {
         // podcastData has all the information for one of the podcasts we were sent in. Get all the episodes from it by iterating its episodes object.
@@ -59,35 +49,36 @@ function aggregateChannels(podcastDatas) {
                 { item: [
                     { guid: episode.guid },
                     { title: episode.title },
-                    { link: "www.cheese.com" },
-                    { description: "test" },
+                    { link: episode.link },
+                    { description: episode.description},
                     { pubDate: episode.published.toString() },
                     { enclosure: [
                         { _attr: { url: episode.enclosure.url } },
-                        { _attr: { length: "255850000" } },
-                        { _attr: { type: "video/mp4" } } 
+                        { _attr: { length: episode.enclosure.length } },
+                        { _attr: { type: episode.enclosure.type } } 
                     ] },
-                    { "itunes:subtitle": episode.title },
+                    { "itunes:subtitle": episode["itunes:subtitle"] },
                     { "itunes:image": [
-                        { _attr: { href: "https://i0.wp.com/www.onegreenplanet.org/wp-content/uploads/2015/08/cheese.jpg" } }
+                        { _attr: { href: episode["itunes:image"] } }
                     ]},
-                    { "itunes:duration": "1:45" },
-                    { "itunes:order": 1}
+                    { "itunes:duration": episode.duration },
+                    { "itunes:order": 0}
                 ]}
 
-            channelObj.channel.push(item)
+            items.push(item)
         }
     }
 
-    // Sort the items in channelObj.channel (the episodes) 
-
     // Sort by pubDate
-    channelObj.channel = channelObj.channel.sort((a, b) => {
+    items = items.sort((a, b) => {
         let dateA = new Date(a.item.find(itemData => itemData.hasOwnProperty("pubDate")).pubDate)
         let dateB = new Date(b.item.find(itemData => itemData.hasOwnProperty("pubDate")).pubDate)
 
         return dateB - dateA;
     })
+
+    // Add the items to the channel object
+    Array.prototype.push.apply(channelObj.channel, items)
 
     return channelObj
 }
@@ -155,41 +146,4 @@ app.get("/", function(req, res) {
         res.set('Content-Type', 'text/xml');
         res.send(xml(feed, { declaration: true }));
     });
-})
-
-app.get("/gamegrumps", function(req, res){
-    console.log("at get gamegrumps")
-    requestFeed(gameGrumpsFeed).then(feed => {
-        console.log("got feed")
-        res.set('Content-Type', 'text/xml');
-        res.send(xml(feed, { declaration: true }));
-    });
-}) 
-app.get("/science", function(req, res){
-    console.log("at get science")
-    requestFeed(scienceFeed).then(feed => {
-        console.log("got feed")
-        res.set('Content-Type', 'text/xml');
-        res.send(xml(feed, { declaration: true }));
-    });
-}) 
-
-app.get("/tech", function(req, res){
-    console.log("at get tech")
-    requestFeed(techFeed).then(feed => {
-        console.log("got feed")
-        res.set('Content-Type', 'text/xml');
-        //res.redirect("http://feeds.feedburner.com/DailyTechHeadlines")
-        res.send(xml(feed, { declaration: true }));
-    });
-}) 
-
-
-// Intercept calls like localhost:7000/media/url="blah.mp3"
-// Return the media at the specified url after incrementing the download counter in our database
-app.get("/media", function(req, res) {
-    console.log("at get('/media')");
-    console.log("url:", req.query.url)
-
-    res.redirect(req.query.url)
 })
