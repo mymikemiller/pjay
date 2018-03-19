@@ -12,7 +12,7 @@ var path = require("path")
 var xml = require("xml")
 var request = require("request");
 var parsePodcast = require("node-podcast-parser");
-var aggregator = require("./aggregator")
+var aggregator = require("./support/aggregator")
 
 var app = express()
 app.use(bodyParser.json())

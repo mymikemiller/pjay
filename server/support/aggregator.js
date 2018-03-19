@@ -9,8 +9,6 @@ module.exports = {
             let podcastData = podcastDatas[i];
             for(var j = 0; j < podcastData.episodes.length; j++) {
                 var episode = podcastData.episodes[j];
-
-                console.log(episode)
                 
                 var item = 
                     { item: [
