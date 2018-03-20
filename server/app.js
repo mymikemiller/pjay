@@ -26,12 +26,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 var port = process.env.port || 7000
 
-// Just Game Grumps audio
-var gameGrumpsFeed = [
-    "https://podsync.net/qyJ88uh3h" // Game Grumps
-];
-
-
 // Parses the given feed and sends to the callback the array of node-podcast-parser's data
 // Access the episodes via data.episodes for the returned data
 function getPodcastData(feedURL) {
@@ -64,41 +58,18 @@ function requestPodcastDatas(feedURLs) {
         getAllPodcastDataPromises.push(getPodcastData(url));
     })
     return Promise.all(getAllPodcastDataPromises);
-    
-    // return new Promise((resolve, reject) => {
-    //     Promise.all(
-    //         getAllPodcastDataPromises
-    //         ).then(podcastDatas => {
-
-    //         console.log("got podcastData");
-    //         var feed = generateFunnel(podcastDatas)
-    //         resolve(feed)
-    //     });
-    // })
 }
 
 app.listen(port, function() {
     console.log("Server is running on port " + port);
 })
 
-// app.get("/", function(req, res) {
-//     console.log("at get('/')");
-
-//     requestPodcastDatas(gameGrumpsFeed).then(podcastDatas => {
-//         console.log("got", podcastDatas.length, "podcastDatas")
-//         var myFunnel = funnel.generate(podcastDatas)
-
-//         res.set('Content-Type', 'text/xml');
-//         res.send(xml(myFunnel, { declaration: true }));
-//     });
-// })
-
-app.get("/funnels/:name", function(req, res) {
+app.get("/:name", function(req, res) {
     var name = req.params.name
-    console.log("at get('/funnels') for funnel named", name);
+    console.log("at get('/') for funnel named", name);
 
     firebase.getFeedURLs(name).then(feedURLs => {
-        return requestPodcastDatas(gameGrumpsFeed)
+        return requestPodcastDatas(feedURLs)
     }).then(podcastDatas => {
         console.log("got", podcastDatas.length, "podcastDatas")
         var myFunnel = funnel.generate(podcastDatas)

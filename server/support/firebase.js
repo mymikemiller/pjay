@@ -51,27 +51,10 @@ module.exports = function(serviceAccountFilePath) {
                     reject("Funnel '" + funnelName + "' not found in database")
                 } else {
                     console.log("got feeds")
-                    console.log(funnel)
-                    resolve(funnel)
+                    console.log(funnel.feedURLs)
+                    resolve(funnel.feedURLs)
                 }
             })
-            // request(feedURL, (err, res, data) => {
-            //     if (err) {
-            //       console.error('Network error', err);
-            //       reject(err)
-            //       return;
-            //     }
-               
-            //     parsePodcast(data, (err, podcastData) => {
-            //         if (err) {
-            //             console.error('Parsing error', err);
-            //             reject(err)
-            //             return;
-            //         }
-                
-            //         resolve(podcastData)
-            //     });
-            // });
         })
 
     }
