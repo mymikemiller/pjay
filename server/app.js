@@ -24,7 +24,7 @@ var app = express()
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, "public")));
 
-var port = process.env.port || 7000
+var port = process.env.PORT || 7000
 
 // Parses the given feed and sends to the callback the array of node-podcast-parser's data
 // Access the episodes via data.episodes for the returned data
